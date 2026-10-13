@@ -3,7 +3,13 @@ const router = express.Router()
 const db = require("../config/db")
 const bcrypt = require("bcrypt")
 
-// Différentes routes associées au User ('/user/route')
+// JWT -> Token de vérification (équivalent des sessions avec d'autres caractéristiques)
+
+// Créer une route qui récupère les données qui se situent dans le LS (ex : user/pirate)
+// Créer un script malveillant qui quand il s'éxecute recup ce qu'il y a en LS et l'envoit vers la route 
+
+// Cela peut etre fait en JS direct ou React, le principe est simple quand on arrive sur la page, SANS S'EN RENDRE COMPTE,
+// toutes les infos que vous trouvez dans le LS doivent etre envoées vers votre Back, à l'insu du user 
 
 // Route du signup
 router.post('/signup', (req, res) => {
@@ -41,6 +47,7 @@ router.post('/signup', (req, res) => {
                 } else {
                     // On a maintenant accès au mot de passe hashé on peut donc ajouter le user en bdd 
                     // On explicite la requete SQL
+
                     sql = "INSERT INTO users(username, email, password) VALUES(?, ?, ?)"
 
                     // On éxecute la query SQL dans notre table users 
@@ -57,9 +64,40 @@ router.post('/signup', (req, res) => {
     })
 })
 
-
 // Route pour le login 
+router.post('/login', (req, res) => {
+    // Récupération des éléments du body 
+    let { username, password } = req.body
 
+    let sql = "SELECT * FROM users WHERE username = ?"
+
+    db.query(sql, [username], (err, results) => {
+
+        if (err) {
+            res.status(500).json("erreur lors de la vérification du username")
+            console.log(err)
+
+        } else if (results.length) {
+
+            // Si ok on recup le hash depuis le résultat de la BDD
+            let hash = results[0].password
+
+            // On compare les hashs
+            bcrypt.compare(password, hash, (err, results) => {
+                if (err) {
+                    res.status(500).json("erreur lors de la comparaison des mdp")
+                    console.log(err)
+                } else if (results) {
+                    res.status(200).json("User login avec succès")
+                } else {
+                    res.json("Le most de passe n'est pas correct")
+                }
+            })
+        } else {
+            res.json("Pas de résultats pour le user donné")
+        }
+    })
+})
 
 // Route le logout
 
