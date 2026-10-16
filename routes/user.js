@@ -2,6 +2,9 @@ const express = require("express")
 const router = express.Router() 
 const db = require("../config/db")
 const bcrypt = require("bcrypt")
+var jwt = require('jsonwebtoken')
+require('dotenv').config()
+// const authJwt = require('../middlewares/jwt')
 
 // Atelier JWT -> Token de vérification (équivalent des sessions avec d'autres caractéristiques)
 
@@ -94,7 +97,25 @@ router.post('/login', (req, res) => {
                     res.status(500).json("erreur lors de la comparaison des mdp")
                     console.log(err)
                 } else if (results) {
-                    res.status(200).json("User login avec succès")
+
+                    // On crée l'access token -> le token court terme qui vient valider les actions du user
+                    const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m'});
+
+                    // On crée aussi le refresh token -> token long terme qui permet de renouveller les access token
+                    const refreshToken = jwt.sign({ username }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '10d'});
+
+                    // Le refresh token est envoyé dans un cookie en httpOnly -> On ne peut pas recup le token avec du JS depuis le front
+                    res.cookie('jwt', refreshToken, {
+                        httpOnly: true,
+                        sameSite: 'None', 
+                        secure: true,
+                        maxAge: 10 * 24 * 60 * 60 * 1000
+                    })
+
+                    // On renvoit l'access token simplement en json
+                    res.json({ accessToken })
+
+
                 } else {
                     res.json("Le mot de passe n'est pas correct")
                 }
