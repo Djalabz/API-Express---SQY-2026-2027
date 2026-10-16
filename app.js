@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const cors = require('cors')
+require('dotenv').config()
 
 // Définitions des routers
 const userRouter = require("./routes/user")

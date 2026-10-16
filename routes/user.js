@@ -3,13 +3,17 @@ const router = express.Router()
 const db = require("../config/db")
 const bcrypt = require("bcrypt")
 
-// JWT -> Token de vérification (équivalent des sessions avec d'autres caractéristiques)
+// Atelier JWT -> Token de vérification (équivalent des sessions avec d'autres caractéristiques)
 
-// Créer une route qui récupère les données qui se situent dans le LS (ex : user/pirate)
-// Créer un script malveillant qui quand il s'éxecute recup ce qu'il y a en LS et l'envoit vers la route 
+// DEVENEZ UN RECELEUR DE XSS
 
-// Cela peut etre fait en JS direct ou React, le principe est simple quand on arrive sur la page, SANS S'EN RENDRE COMPTE,
-// toutes les infos que vous trouvez dans le LS doivent etre envoées vers votre Back, à l'insu du user 
+// Créer une route coté back qui récupère des données (ex : user/pirate)
+// Créer un script malveillant coté front qui, quand il s'éxecute, recupère ce qu'il y a en LS et l'envoit vers la route pirate 
+
+// Cela peut etre fait en JS direct ou React, sur une page a priori inoffensive, le principe est simple quand on dessus, 
+// SANS S'EN RENDRE COMPTE, toutes les infos que vous trouvez dans le LS doivent etre envoées vers votre Back
+// Tout ça à l'insu du user bien sur...
+
 
 // Route du signup
 router.post('/signup', (req, res) => {
@@ -36,8 +40,6 @@ router.post('/signup', (req, res) => {
                 res.json("Email déjà utilisé")
             }
         } else {
-
-            res.json('Aucun user trouvé en BDD')
 
             // Si pas de user en DB -> Hasher le mot de passe 
             bcrypt.hash(password, 10, (err, hash) => {
@@ -69,6 +71,8 @@ router.post('/login', (req, res) => {
     // Récupération des éléments du body 
     let { username, password } = req.body
 
+    console.log(req.body)
+
     let sql = "SELECT * FROM users WHERE username = ?"
 
     db.query(sql, [username], (err, results) => {
@@ -81,6 +85,8 @@ router.post('/login', (req, res) => {
 
             // Si ok on recup le hash depuis le résultat de la BDD
             let hash = results[0].password
+            
+            console.log(results)
 
             // On compare les hashs
             bcrypt.compare(password, hash, (err, results) => {
@@ -90,7 +96,7 @@ router.post('/login', (req, res) => {
                 } else if (results) {
                     res.status(200).json("User login avec succès")
                 } else {
-                    res.json("Le most de passe n'est pas correct")
+                    res.json("Le mot de passe n'est pas correct")
                 }
             })
         } else {
@@ -99,7 +105,11 @@ router.post('/login', (req, res) => {
     })
 })
 
-// Route le logout
+// Route pirate ....
+router.post('/pirate', (req, res) => {
+    let { body } = req
+    console.log(body)
+})
 
 
 module.exports = router
