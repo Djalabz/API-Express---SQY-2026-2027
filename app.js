@@ -2,10 +2,12 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const cors = require('cors')
+const db = require('./config/db')
 
 
 // Définitions des routers
 const userRouter = require("./routes/user")
+const productRouter = require("./routes/product")
 
 // Convertit toutes les entrées depuis JSON
 app.use(express.json())
@@ -29,6 +31,9 @@ app.get('/', (req, res) => {
 // Mise en place du router -> Les routes sont regroupés poar catégories, ici toutes celles liées aux user 
 // seront disponibles après /user au niveau du endpoint 
 app.use('/user', userRouter)
+app.use('/product', productRouter)
+
+
 
 
 // On spécifie que notre app écoute les requetes arrivant sur le port 3000

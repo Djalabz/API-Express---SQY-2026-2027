@@ -77,6 +77,8 @@ router.post('/login', (req, res) => {
 
             // Si ok on recup le hash depuis le résultat de la BDD
             let hash = results[0].password
+            let user = results[0]
+
 
             // On compare les hashs
             bcrypt.compare(password, hash, (err, results) => {
@@ -85,13 +87,11 @@ router.post('/login', (req, res) => {
                     console.log(err)
                 } else if (results) {
 
-                    console.log("password ok -> phase de création des jwt")
-
                     // On crée l'access token -> le token court terme qui vient valider les actions du user
-                    const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m'});
+                    const accessToken = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m'});
 
                     // On crée aussi le refresh token -> token long terme qui permet de renouveller les access token
-                    const refreshToken = jwt.sign({ username }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '10d'});
+                    const refreshToken = jwt.sign(user , process.env.REFRESH_TOKEN_SECRET, { expiresIn: '10d'});
 
                     // Le refresh token est envoyé dans un cookie en httpOnly -> On ne peut pas recup le token avec du JS depuis le front
                     res.cookie('jwt', refreshToken, {

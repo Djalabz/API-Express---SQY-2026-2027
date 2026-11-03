@@ -12,17 +12,20 @@ function authJWT(req, res, next) {
     }
 
     // On vient extraire les infos dont on a besoin du token : decoded payload
-    const token = authHeader.split("")[1]
+    const token = authHeader.split(" ")[1]
+
+    console.log(token)
 
     // On va tenter de vérifier le token 
     try {
         // On vérifie dans un premier temps puis on ajoute les infos à l'objet req
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         req.user = decoded
-
         next()
+        
     } catch(err) {
-        return res.status().json({ message : "Token est invalide" })
+        console.log(err)
+        return res.status(500).json({ message : "Token est invalide" })
     }
 }
 
