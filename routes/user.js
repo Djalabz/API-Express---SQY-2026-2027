@@ -4,7 +4,7 @@ const db = require("../config/db")
 const bcrypt = require("bcrypt")
 var jwt = require('jsonwebtoken')
 require('dotenv').config()
-// const authJwt = require('../middlewares/jwt')
+const authJWT = require('../middlewares/jwt')
 
 
 // Route du signup
@@ -77,8 +77,6 @@ router.post('/login', (req, res) => {
 
             // Si ok on recup le hash depuis le résultat de la BDD
             let hash = results[0].password
-            
-            console.log(results)
 
             // On compare les hashs
             bcrypt.compare(password, hash, (err, results) => {
@@ -86,6 +84,8 @@ router.post('/login', (req, res) => {
                     res.status(500).json("erreur lors de la comparaison des mdp")
                     console.log(err)
                 } else if (results) {
+
+                    console.log("password ok -> phase de création des jwt")
 
                     // On crée l'access token -> le token court terme qui vient valider les actions du user
                     const accessToken = jwt.sign({ username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5m'});
@@ -101,8 +101,10 @@ router.post('/login', (req, res) => {
                         maxAge: 10 * 24 * 60 * 60 * 1000
                     })
 
+                    console.log(accessToken)
+
                     // On renvoit l'access token simplement en json
-                    res.json({ accessToken })
+                    res.json(accessToken)
 
 
                 } else {
