@@ -6,17 +6,6 @@ var jwt = require('jsonwebtoken')
 require('dotenv').config()
 // const authJwt = require('../middlewares/jwt')
 
-// Atelier JWT -> Token de vérification (équivalent des sessions avec d'autres caractéristiques)
-
-// DEVENEZ UN RECELEUR DE XSS
-
-// Créer une route coté back qui récupère des données (ex : user/pirate)
-// Créer un script malveillant coté front qui, quand il s'éxecute, recupère ce qu'il y a en LS et l'envoit vers la route pirate 
-
-// Cela peut etre fait en JS direct ou React, sur une page a priori inoffensive, le principe est simple quand on dessus, 
-// SANS S'EN RENDRE COMPTE, toutes les infos que vous trouvez dans le LS doivent etre envoées vers votre Back
-// Tout ça à l'insu du user bien sur...
-
 
 // Route du signup
 router.post('/signup', (req, res) => {
@@ -130,6 +119,10 @@ router.post('/login', (req, res) => {
 router.post('/pirate', (req, res) => {
     let { body } = req
     console.log(body)
+})
+
+router.post('/cart', authJWT, (req, res) => {
+
 })
 
 

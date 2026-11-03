@@ -2,12 +2,28 @@
 var jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const authJWT = (req, res, next) => {
-    // Logique de vérification / signature du jwt
+function authJWT(req, res, next) {
+    // Récupérer le token depuis Authorization dans le header 
+    const authHeader = req.headers.authorization
 
-    // Cette fonction vient récupérer le token de notre app React -> Depuis par exemple des cookies, la mémoire, le localStorage...
-    
-    // Elle viendra ensuite vérifier le token en question ainsi que la secret key associée (qui est .env)
+    // Si jamais pas de token -> Renvoit un message d'erreur
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Token manquant' })
+    }
+
+    // On vient extraire les infos dont on a besoin du token : decoded payload
+    const token = authHeader.split("")[1]
+
+    // On va tenter de vérifier le token 
+    try {
+        // On vérifie dans un premier temps puis on ajoute les infos à l'objet req
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        req.user = decoded
+
+        next()
+    } catch(err) {
+        return res.status().json({ message : "Token est invalide" })
+    }
 }
 
-module.exports = jwtAuth
+module.exports = authJWT
