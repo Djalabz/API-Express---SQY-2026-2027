@@ -6,9 +6,11 @@ const db = require('../config/db')
 
 const authJWT = require('../middlewares/jwt')
 
-// Route d'affichage de l'ensemble des produits 
+// Route d'affichage de l'ensemble des produits (avec leur notes et leur commentaires associés)
 router.get("/all",  (req, res) => {
-    let sql = "SELECT p.*, AVG(pr.rating) AS moyenne_note FROM products p LEFT JOIN product_ratings pr ON p.id_product = pr.id_product GROUP BY p.id_product"
+    let sql = `SELECT p.*, AVG(pr.rating) AS moyenne_note, ANY_VALUE(pr.comment) 
+                FROM products p LEFT JOIN product_ratings pr ON p.id_product = pr.id_product 
+                GROUP BY p.id_product`
 
     db.query(sql, (err, results) => {
 
@@ -44,6 +46,25 @@ router.get("/:id", (req, res) => {
     })
 })
 
+// Route qui va nous permettre d'ajouter un commentaire lié à un produit 
+router.post("/comment/new", authJWT, (req, res) => {
+    let { product_id, comment } = req.body
+    let user_id = req.user.id_user
+
+
+    let sql = "INSERT INTO product_ratings(comment, id_user, id_product) VALUES(?, ?, ?)"
+
+    db.query(sql, [comment, user_id, product_id], (err, results) => {
+        if (err) {
+            console.log(err)
+            res.send(err)
+
+        } else {
+            console.log(results)
+            res.json(results)
+        }
+    })
+})
 
 
 // Route qui va nous permettre de noter un produit

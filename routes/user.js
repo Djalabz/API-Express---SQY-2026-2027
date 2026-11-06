@@ -88,7 +88,7 @@ router.post('/login', (req, res) => {
                 } else if (results) {
 
                     // On crée l'access token -> le token court terme qui vient valider les actions du user
-                    const accessToken = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m'});
+                    const accessToken = jwt.sign(user , process.env.ACCESS_TOKEN_SECRET, { expiresIn: '35m'});
 
                     // On crée aussi le refresh token -> token long terme qui permet de renouveller les access token
                     const refreshToken = jwt.sign(user , process.env.REFRESH_TOKEN_SECRET, { expiresIn: '10d'});
