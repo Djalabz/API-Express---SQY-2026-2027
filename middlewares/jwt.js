@@ -25,7 +25,7 @@ function authJWT(req, res, next) {
         
     } catch(err) {
         console.log(err)
-        return res.status(500).json({ message : "Token est invalide" })
+        return res.status(401).json({ message : "Token est invalide" })
     }
 }
 

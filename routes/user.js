@@ -112,7 +112,7 @@ router.post('/login', (req, res) => {
                 }
             })
         } else {
-            res.json("Pas de résultats pour le user donné")
+            res.json({ message : "Pas de résultats pour le user donné" })
         }
     })
 })

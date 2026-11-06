@@ -6,6 +6,30 @@ const db = require('../config/db')
 
 const authJWT = require('../middlewares/jwt')
 
+
+router.get("/all",  (req, res) => {
+
+    let sql = "SELECT * FROM products"
+
+    db.query(sql, (err, results) => {
+
+        if (err) {
+
+            console.log(err)
+            res.send(err)
+
+        } else {
+
+            console.log(results)
+            res.json(results)
+            
+        }
+
+    })
+
+})
+
+
 router.post("/rating", authJWT, (req, res) => {
     // Je vais vouloir recup la note et l'envoyer pour le bon produit 
     let { note, product_id } = req.body
