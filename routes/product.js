@@ -6,30 +6,47 @@ const db = require('../config/db')
 
 const authJWT = require('../middlewares/jwt')
 
-
+// Route d'affichage de l'ensemble des produits 
 router.get("/all",  (req, res) => {
-
-    let sql = "SELECT * FROM products"
+    let sql = "SELECT p.*, AVG(pr.rating) AS moyenne_note FROM products p LEFT JOIN product_ratings pr ON p.id_product = pr.id_product GROUP BY p.id_product"
 
     db.query(sql, (err, results) => {
 
         if (err) {
-
             console.log(err)
             res.send(err)
 
         } else {
-
             console.log(results)
             res.json(results)
-            
         }
-
     })
-
 })
 
 
+// Route d'affichage des détails d'un produit via son id
+router.get("/:id", (req, res) => {
+    // Je recup l'id du produit depuis les params de l'url
+    let { id } = req.params
+
+    // Requete qui recup les details d'un produit + la moyenne des notes qui le concernent
+    let sql = "SELECT p.*, AVG(pr.rating) AS moyenne_note FROM products p JOIN product_ratings pr ON p.id_product = pr.id_product GROUP BY p.id_product HAVING p.id_product = ?"
+
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.log(err)
+            res.send(err)
+
+        } else {
+            console.log(results)
+            res.json(results)
+        }
+    })
+})
+
+
+
+// Route qui va nous permettre de noter un produit
 router.post("/rating", authJWT, (req, res) => {
     // Je vais vouloir recup la note et l'envoyer pour le bon produit 
     let { note, product_id } = req.body
