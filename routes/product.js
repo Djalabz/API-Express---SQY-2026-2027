@@ -68,6 +68,7 @@ router.post("/comment/new", authJWT, (req, res) => {
     let { product_id, comment } = req.body
     let user_id = req.user.id_user
 
+    console.log(req.user)
 
     let sql = "INSERT INTO product_ratings(comment, id_user, id_product) VALUES(?, ?, ?)"
 
@@ -78,7 +79,7 @@ router.post("/comment/new", authJWT, (req, res) => {
 
         } else {
             console.log(results)
-            res.json(results)
+            res.json({ results, user : req.user })
         }
     })
 })
