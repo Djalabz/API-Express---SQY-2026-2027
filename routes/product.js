@@ -19,12 +19,11 @@ router.get("/all",  (req, res) => {
             res.send(err)
 
         } else {
-            console.log(results)
+            // console.log(results)
             res.json(results)
         }
     })
 })
-
 
 // Route d'affichage des détails d'un produit via son id
 router.get("/:id", (req, res) => {
@@ -33,6 +32,24 @@ router.get("/:id", (req, res) => {
 
     // Requete qui recup les details d'un produit + la moyenne des notes qui le concernent
     let sql = "SELECT p.*, AVG(pr.rating) AS moyenne_note FROM products p JOIN product_ratings pr ON p.id_product = pr.id_product GROUP BY p.id_product HAVING p.id_product = ?"
+
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.log(err)
+            res.send(err)
+
+        } else {
+            // console.log(results)
+            res.json(results)
+        }
+    })
+})
+
+router.get("/:id/comments", authJWT, (req, res) => {
+    // Je recup l'id du produit depuis les params de l'url
+    let { id } = req.params
+
+    let sql = "SELECT username, comment, date FROM product_ratings INNER JOIN users ON users.id_user = product_ratings.id_user WHERE id_product = ? AND comment IS NOT NULL"
 
     db.query(sql, [id], (err, results) => {
         if (err) {
@@ -65,7 +82,6 @@ router.post("/comment/new", authJWT, (req, res) => {
         }
     })
 })
-
 
 // Route qui va nous permettre de noter un produit
 router.post("/rating", authJWT, (req, res) => {
