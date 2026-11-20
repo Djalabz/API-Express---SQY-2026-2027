@@ -123,9 +123,25 @@ router.post('/pirate', (req, res) => {
     console.log(body)
 })
 
+
 router.post('/cart', authJWT, (req, res) => {
 
 })
 
+// Routes qui concernent la page de profil
+router.put('/profile', authJWT, (req, res) => {
+    let { username, email, description, avatar } = req.body
+    let { user } = req
+
+    let sql = "UPDATE users SET username = ?, email = ? , description = ?, avatar = ? WHERE id_user = ?"
+
+    db.query(sql, [username, email, description, avatar, user.id_user], (err, results) => {
+        if (err) {res.status(500)}
+        else {
+            console.log(results)
+            res.status(200).json({ "message" : "Informations modifiées avec succès !" })
+        }
+    })
+})
 
 module.exports = router
